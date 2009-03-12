@@ -31,8 +31,41 @@ class StubProxyTest < Test::Unit::TestCase
       assert_nil @proxy.association(:user)
     end
 
-    should "return a mock object when asked for the result" do
-      assert_kind_of Object, @proxy.result
+    context "result object" do
+      should "return a generic object when stubbing a nil class" do
+        assert_kind_of Object, @proxy.result
+      end
+
+      context "for a specific class" do
+        setup do
+          @my_class = Class.new
+          @proxy = Factory::Proxy::Stub.new @my_class
+          @result = @proxy.result
+        end
+
+        should "return instance of the class being stubbed" do
+          assert_kind_of @my_class, @result
+        end
+
+        should "return superclass name" do
+          assert_equal @my_class.name, @result.class.name
+        end
+
+        should "return superclass inspect" do
+          assert_equal @my_class.inspect, @result.class.inspect
+        end
+
+        should "override superclass initialize" do
+          my_raise_class = Class.new do
+            def initialize
+              raise "limited initialize"
+            end
+          end
+          assert_nothing_raised do
+            Factory::Proxy::Stub.new my_raise_class
+          end
+        end
+      end
     end
 
     context "after setting an attribute" do

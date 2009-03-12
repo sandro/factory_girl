@@ -2,9 +2,18 @@ class Factory
   class Proxy
     class Stub < Proxy #:nodoc:
       def initialize(klass)
-        @mock = Object.new
+        if klass && klass.respond_to?(:new)
+          stub_class = Class.new(klass) do
+            def self.name; superclass.name; end
+            def self.inspect; superclass.inspect; end
+            define_method(:initialize) {}
+          end
+        else
+          stub_class = Object
+        end
+        @mock = stub_class.new
       end
-      
+
       def get(attribute)
         @mock.send(attribute)
       end
