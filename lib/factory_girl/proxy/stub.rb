@@ -10,18 +10,35 @@ class Factory
       end
       
       def set(attribute, value)
-        unless @mock.respond_to?("attribute=")
-          class << @mock; self end.send(:attr_accessor, attribute)
+        ivar = ivar_name(attribute)
+        inner = class << @mock; self end
+
+        unless @mock.respond_to?("#{ivar}=")
+          inner.send(:attr_accessor, ivar)
         end
-        @mock.send("#{attribute}=", value)
+
+        unless @mock.respond_to?(attribute)
+          inner.send(:define_method, attribute) do
+            instance_variable_get(:"@#{ivar}")
+          end
+        end
+
+        @mock.send("#{ivar}=", value)
       end
-      
+
       def associate(name, factory, attributes)
         set(name, nil)
       end
       
       def result
         @mock      
+      end
+
+      private
+
+      def ivar_name(symbol)
+        # from ActiveSupport::Memoizable
+        symbol.to_s.sub(/\?\Z/, '_query').sub(/!\Z/, '_bang').to_sym
       end
     end
   end

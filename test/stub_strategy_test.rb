@@ -47,6 +47,44 @@ class StubProxyTest < Test::Unit::TestCase
       should "return that value when asked for that attribute" do
         assert_equal 'value', @proxy.get(:attribute)
       end
-    end    
+
+      should "create a setter" do
+        assert_equal true, @proxy.result.respond_to?(:attribute=)
+      end
+
+      should "change the attribute" do
+        obj = @proxy.result
+        obj.attribute = 'new value'
+        assert_equal 'new value', obj.attribute
+      end
+
+      context "responds to query methods" do
+        setup do
+          @proxy.set(:query?, 'value')
+        end
+
+        should "return the value given" do
+          assert_equal 'value', @proxy.get(:query?)
+        end
+
+        should "define a special instance variable" do
+          assert_equal true, @proxy.result.instance_variables.include?("@query_query")
+        end
+      end
+
+      context "supports bang methods" do
+        setup do
+          @proxy.set(:bang!, 'value')
+        end
+
+        should "return the value given" do
+          assert_equal 'value', @proxy.get(:bang!)
+        end
+
+        should "define a special instance variable" do
+          assert_equal true, @proxy.result.instance_variables.include?("@bang_bang")
+        end
+      end
+    end
   end
 end

@@ -109,11 +109,11 @@ class IntegrationTest < Test::Unit::TestCase
   context "a generated mock instance" do
 
     setup do
-      @stub = Factory.stub(:user, :first_name => 'Bill')
+      @stub = Factory.stub(:user, :first_name => 'Bill', :adult? => false, :suspend! => true)
     end
 
     should "assign all attributes" do
-      [:admin, :email, :first_name, :last_name].each do |attr|
+      [:admin, :email, :first_name, :last_name, :adult?, :suspend!].each do |attr|
         assert_not_nil @stub.send(attr)     
       end
     end
