@@ -38,7 +38,10 @@ class StubProxyTest < Test::Unit::TestCase
 
       context "for a specific class" do
         setup do
-          @my_class = Class.new
+          @my_class = Class.new do
+            def self.inspect; 'my_class' end
+            def self.to_s; 'my_class' end
+          end
           @proxy = Factory::Proxy::Stub.new @my_class
           @result = @proxy.result
         end
@@ -47,8 +50,8 @@ class StubProxyTest < Test::Unit::TestCase
           assert_kind_of @my_class, @result
         end
 
-        should "return superclass name" do
-          assert_equal @my_class.name, @result.class.name
+        should "return superclass to_s" do
+          assert_equal @my_class.to_s, @result.class.to_s
         end
 
         should "return superclass inspect" do

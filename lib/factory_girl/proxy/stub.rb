@@ -4,9 +4,9 @@ class Factory
       def initialize(klass)
         if klass && klass.respond_to?(:new)
           stub_class = Class.new(klass) do
-            def self.name; superclass.name; end
-            def self.inspect; superclass.inspect; end
-            define_method(:initialize) {}
+            def self.inspect; superclass.inspect end
+            def self.to_s; superclass.to_s end
+            def initialize; end
           end
         else
           stub_class = Object
