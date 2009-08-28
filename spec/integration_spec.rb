@@ -22,6 +22,10 @@ describe "integration" do
       f.email { Factory.next(:email) }
     end
 
+    Factory.define :book, :default_strategy => :stub do |f|
+      f.title "Metamorphosis"
+    end
+
     Factory.define :sequence_abuser, :class => User do |f|
       f.first_name { Factory.sequence(:email) }
     end
@@ -154,6 +158,17 @@ describe "integration" do
       lambda { @stub.destroy }.should raise_error(RuntimeError)
       lambda { @stub.save }.should raise_error(RuntimeError)
       lambda { @stub.increment!(:age) }.should raise_error(RuntimeError)
+    end
+
+    context "for a non-ActiveRecord model" do
+      it "instantiates a book" do
+        Factory(:book).should be_instance_of(Book)
+      end
+
+      it "sets the title" do
+        book = Factory(:book, :title => 'The Rails Way')
+        book.title.should == 'The Rails Way'
+      end
     end
   end
 

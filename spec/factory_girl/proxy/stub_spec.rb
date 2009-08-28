@@ -66,4 +66,51 @@ describe Factory::Proxy::Stub do
       @stub.get(:attribute).should == @value
     end
   end
+
+  describe "making the instance ActiveRecord compatible" do
+    before do
+      @class = Class.new { def initialize(arguments);end }
+      @next_id = Factory::Proxy::Stub.send(:class_variable_get, '@@next_id') + 1
+    end
+
+    context "when the instance has an id setter" do
+      before do
+        @class.class_eval do
+          def id=(value);end
+        end
+      end
+
+      it "sets id to the next id" do
+        mock.proxy(@class).allocate do |instance|
+          mock(instance).id=(@next_id)
+          instance
+        end
+        Factory::Proxy::Stub.new(@class)
+      end
+    end
+
+    context "when the instance does not have an id setter" do
+      it "does not set the id" do
+        stub = Factory::Proxy::Stub.new(@class)
+        stub.result.should_not have_received(:id=).with(@next_id)
+      end
+    end
+  end
+
+  describe "when object instantiation requires arguments" do
+    before do
+      @class = Class.new { def initialize(arguments);end }
+    end
+
+    it "does not raise ArgumentError" do
+      expect {
+        Factory::Proxy::Stub.new(@class)
+      }.to_not raise_error(ArgumentError)
+    end
+
+    it "instantiates the object" do
+      stub = Factory::Proxy::Stub.new(@class)
+      stub.result.should be_instance_of(@class)
+    end
+  end
 end

@@ -4,8 +4,8 @@ class Factory
       @@next_id = 1000
 
       def initialize(klass)
-        @stub = klass.new
-        @stub.id = next_id
+        @stub = klass.new rescue klass.allocate
+        @stub.id = next_id if @stub.respond_to?(:id=)
         @stub.instance_eval do
           def new_record?
             id.nil?

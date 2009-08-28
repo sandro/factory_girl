@@ -41,3 +41,10 @@ class Post < ActiveRecord::Base
   validates_presence_of :name, :author_id
   belongs_to :author, :class_name => 'User'
 end
+
+class Book
+  attr_accessor :title
+  def initialize(title)
+    @title = title
+  end
+end
